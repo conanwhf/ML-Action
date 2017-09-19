@@ -24,10 +24,10 @@ def KnnTest():
 	knn.addDataSet({'P1':[1.0, 1.0, 0.0, 0.0], 
 					'P2':[1.1, 1.0, 0.0, 0.1],
 					'Class': ['A', 'A', 'B', 'B']})
-	#knn.addDataSet({'P1':[1.0, 3.1, 0.2, 0.3], 
-	#					'P2':[1.2, 0.0, 7.0, 4.1],
-	#					'Class': ['A', 'A', 'B', 'B']})					
-	print(knn.classify({'P1':0.0, 'P2':0.0}, 3))
+	knn.addDataSet({'P1':[1.0, 3.1, 0.2, 0.3], 
+						'P2':[1.2, 0.0, 0.0, 0.1],
+						'Class': ['A', 'A', 'B', 'B']})					
+	print(knn.classify({'P1':0.0, 'P2':0.2}, 3))
 	del(knn)
 	return 
 
@@ -69,7 +69,7 @@ def DatingClassTest():
 			pass
 		else:
 			fail = fail +1
-			print("fail, res=%s, should be %s" %(res,target[i]))
+			print("fail, index=%d, res=%s, should be %s" %(i, res,target[i]))
 			print(testDataSet.loc[i])
 	print("Fail：%d/%d, %.2f%%\n" %(fail, count, float(fail)/float(count)*100 ) )
 	del(dating)
@@ -103,5 +103,5 @@ def ClassifyPerson(Flying, TVgame, IceCream ):
 if __name__ == "__main__":
 	#KnnTest()
 	#ShowData()
-	#DatingClassTest()
-	ClassifyPerson(Flying=10000, TVgame=10, IceCream=0.5)
+	DatingClassTest()
+	#ClassifyPerson(Flying=10000, TVgame=10, IceCream=0.5)

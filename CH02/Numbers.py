@@ -6,6 +6,7 @@ import os
 
 DIR_TRAINING_DATA = "digits/trainingDigits/"
 DIR_TEST_DATA = "digits/testDigits/"
+#DIR_TEST_DATA = "digits/mytest/"
 EACH_DATA_SIZE = 1024
 
 '''将txt数据读取为数组'''

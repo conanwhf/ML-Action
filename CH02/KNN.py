@@ -68,9 +68,19 @@ class KNN(object):
 		data = data.sort_values(by=['Distances'])
 		#print("New distances mat:\n",self.dataSet)
 		# 5. 选择距离最小的k个点， 统计Class中各个值出现的次数
-		res = data.head(k)[CLASS_COL_NAME].value_counts()
-		#print(res)
-		return res.index[0]
+		neighbors = data.head(k)[CLASS_COL_NAME].value_counts()
+		#print(neighbors)
+		# 6. 如果类别统计中头两名次数相等，则找到距离最近的类；否则直接归类为出现次数最多的类
+		if len(neighbors)>1 and neighbors.iloc[0]==neighbors.iloc[1]:
+			print(neighbors)
+			for i in data.head(k).index:
+				print("index=%d, data class=%s, neighbors=[%s,%s]"%(i,data[CLASS_COL_NAME][i],neighbors.index[0],neighbors.index[1]))
+				if data[CLASS_COL_NAME][i]==neighbors.index[0] or data[CLASS_COL_NAME][i]==neighbors.index[1]:
+					break
+			res = data[CLASS_COL_NAME][i]
+		else:
+			res = neighbors.index[0]
+		return res
 	
 	# 数据归一化，将所有特征值根据取值范围归一化为0-1的数据，以消除不同特征数据大小对欧式距离计算造成的影响
 	def autoNorm(self):
