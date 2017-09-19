@@ -32,7 +32,7 @@ class KNN(object):
 		return (self.dataSet)
 		
 	def setDataSet(self, data):
-		self.dataSet = data
+		self.dataSet = data.copy(deep=True)
 		self.count = len(data)
 		return 	
 	
@@ -69,6 +69,7 @@ class KNN(object):
 		#print("New distances mat:\n",self.dataSet)
 		# 5. 选择距离最小的k个点， 统计Class中各个值出现的次数
 		res = data.head(k)[CLASS_COL_NAME].value_counts()
+		#print(res)
 		return res.index[0]
 	
 	# 数据归一化，将所有特征值根据取值范围归一化为0-1的数据，以消除不同特征数据大小对欧式距离计算造成的影响

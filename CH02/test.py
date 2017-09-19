@@ -4,6 +4,8 @@
 import matplotlib.pyplot as plt
 from KNN import *
 
+FN_DATING_DATA = 'datingTestSet.txt'
+
 '''绘制散点图'''
 def draw(x, y, color='b', size=20):
 	fig = plt.figure()
@@ -33,7 +35,7 @@ def KnnTest():
 ''' Test2，从文件读取数据并用散点图显示'''
 def ShowData():
 	dating = KNN()
-	dating.getDataSetByFile(fn= 'datingTestSet.txt',
+	dating.getDataSetByFile(fn= FN_DATING_DATA,
 			sep='[\s,\t,\,]+', 
 			names=['Flying','TVgame','IceCream','Class'])
 	#根据分类生成数字指代的分类表，并绘制图像
@@ -47,20 +49,20 @@ def ShowData():
 def DatingClassTest():
 	dating = KNN()
 	# 读取数据
-	dating.getDataSetByFile(fn= 'datingTestSet.txt',
+	dating.getDataSetByFile(fn= FN_DATING_DATA,
 				sep='[\s,\t,\,]+', 
 				names=['Flying','TVgame','IceCream','Class'])
 	# 归一化数据
 	dating.autoNorm()
 	# 取出10%的数据作为测试验证
-	(testDataSet, target) = dating.getSamples(fraction=0.09)	
+	(testDataSet, target) = dating.getSamples(fraction=0.1)	
 	count = 0
 	fail = 0
 	# 验证每一个测试数据
 	for i in testDataSet.index:
 		count = count +1
 		#print("i=%d, target=%s\n" %(i, target[i]))
-		print(dict(testDataSet.loc[i]))
+		#print(dict(testDataSet.loc[i]))
 		res = dating.classify(dict(testDataSet.loc[i]), k=3)
 		if res == target[i]:
 			#print("success, res=%s" %res)
@@ -69,7 +71,7 @@ def DatingClassTest():
 			fail = fail +1
 			print("fail, res=%s, should be %s" %(res,target[i]))
 			print(testDataSet.loc[i])
-	print("失败率：%d/%d, %.2f%%\n" %(fail, count, float(fail)/float(count)*100 ) )
+	print("Fail：%d/%d, %.2f%%\n" %(fail, count, float(fail)/float(count)*100 ) )
 	del(dating)
 	return
 
@@ -79,7 +81,7 @@ def DatingClassTest():
 def ClassifyPerson(Flying, TVgame, IceCream ):
 	dating = KNN()
 	# 读取数据
-	dating.getDataSetByFile(fn= 'datingTestSet.txt',
+	dating.getDataSetByFile(fn= FN_DATING_DATA,
 				sep='[\s,\t,\,]+', 
 				names=['Flying','TVgame','IceCream','Class'])
 	#输入测试数据
