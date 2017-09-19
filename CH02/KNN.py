@@ -4,7 +4,6 @@
 import numpy as np
 import pandas as pd
 import operator
-import matplotlib.pyplot as plt
 
 '''
 k近邻算法-对未知类别属性的数据集中的每个点依次执行以下操作：
@@ -14,10 +13,12 @@ k近邻算法-对未知类别属性的数据集中的每个点依次执行以下
  4. 确定前k个点所在类别的出现频率；
  5. 返回前k个点出现频率最高的类别作为当前点的预测分类。
 '''
+CLASS_COL_NAME = 'Class'
+NORM_COL_PLUS = '_Norm'
 
 class KNN(object):
 	def __init__(self, labels=[]):#特征点的属性名称
-		self.dataSet = pd.DataFrame(columns=labels+ ['Class'])
+		self.dataSet = pd.DataFrame(columns=labels+ [CLASS_COL_NAME])
 		self.count = 0
 		return
 		
@@ -67,43 +68,40 @@ class KNN(object):
 		data = data.sort_values(by=['Distances'])
 		#print("New distances mat:\n",self.dataSet)
 		# 5. 选择距离最小的k个点， 统计Class中各个值出现的次数
-		res = data.head(k)['Class'].value_counts()
+		res = data.head(k)[CLASS_COL_NAME].value_counts()
 		return res.index[0]
 	
-
-'''绘制散点图'''
-def draw(x, y, color='b'):
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	ax.scatter(x, y, c=color)
-	plt.show()
-	return
-
-
-''' Main
-'''
-if __name__ == "__main__":
-	''' Part1，简单测试KNN算法
-	knn = KNN(['P1', 'P2'])	
-	knn.addDataSet({'P1':[1.0, 1.1, 0.1, 0.2], 
-						'P2':[1.1, 1.0, 2.0, 2.1],
-						'Class': ['A', 'A', 'B', 'B']})
-	knn.addDataSet({'P1':[1.0, 3.1, 0.2, 0.3], 
-							'P2':[1.2, 0.0, 7.0, 4.1],
-							'Class': ['A', 'A', 'B', 'B']})					
-	print(knn.classify({'P1':1.1, 'P2':1.0}, 5))
-	del(knn)
-	'''
-
-	''' Part2，计算'''
-	dating = KNN()
-	dating.getDataSetByFile(fn= 'datingTestSet.txt',
-				sep='[\s,\t,\,]+', 
-				names=['Flying','TVgame','IceCream','Class'])
-	#根据分类生成数字指代的分类表，并绘制图像
-	classList = dating.dataSet['Class'].replace({"largeDoses":2, "smallDoses":1, "didntLike":0})
-	draw(dating.dataSet['IceCream'], dating.dataSet['Flying'],
-			color=30*classList)
+	# 数据归一化，将所有特征值根据取值范围归一化为0-1的数据，以消除不同特征数据大小对欧式距离计算造成的影响
+	def autoNorm(self):
+		# 1. 获取每个特征点的最大最小值
+		minVals = self.dataSet.drop(CLASS_COL_NAME, 1).min(0)
+		maxVals = self.dataSet.drop(CLASS_COL_NAME, 1).max(0)
+		ranges = maxVals - minVals
+		#print(ranges)
+		new = pd.DataFrame()
+		# 2. 分别对每个特征点数据进行归一化，跳过分类结果列
+		for i in self.dataSet:
+			if i!= CLASS_COL_NAME:
+				new[i+NORM_COL_PLUS]=self.dataSet[i]/ranges[i]
+				self.dataSet.drop([i], inplace=True,axis=1)
+		# 3. 将归一化后的数据直接添加至原有数据表
+		#self.dataSet = pd.merge(self.dataSet, new, how='outer', left_index=True,right_index=True)
+		self.dataSet = pd.concat([self.dataSet,new],axis=1)
+		#print(self.dataSet)
+		return new
 	
-	
-	
+	# 将部分数据取出作为验证组，并从原数据集中删除
+	def getSamples(self, fraction=0.1):
+		# 1. 抽样(随机或头n个)
+		samples = self.dataSet.sample(n=None, frac=fraction, replace=False, weights=None, random_state=None, axis=0)
+		#samples = self.dataSet.head(int(self.count*fraction))
+		# 2. 将抽样数据从训练集中删除
+		self.dataSet.drop(samples.index, inplace=True, axis=0)
+		# 3. 将目标结果独立抽出
+		target = samples[CLASS_COL_NAME]
+		samples = samples.drop(CLASS_COL_NAME, axis=1)
+		#print(self.dataSet)
+		return samples, target
+		
+		
+		
